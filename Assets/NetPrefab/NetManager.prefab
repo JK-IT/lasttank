@@ -52,10 +52,10 @@ MonoBehaviour:
   serverTickRate: 30
   serverBatching: 0
   serverBatchInterval: 0
-  offlineScene: 
-  onlineScene: 
+  offlineScene: Assets/Scenes/StartScene.unity
+  onlineScene: Assets/Scenes/OnlineScene.unity
   transport: {fileID: 2912817831814220193}
-  networkAddress: localhost
+  networkAddress: 127.0.0.1
   maxConnections: 100
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Port: 7777
+  Port: 7755
   NoDelay: 1
   Interval: 10
   FastResend: 2

@@ -12,33 +12,35 @@ using System.Collections.Generic;
 public class KnetManager : NetworkManager
 {
     #region knetManager EVENT----------
-    public static System.Action<bool> OnServerHostStarted;
+
+    public static System.Action<string> OnRoomIdsCreated;
 
     #endregion
 
 
     #region knetManager VARIABLE-----------
 
-    //public static string serveripaddr = "10.0.0.1";
 
     private static List<string> offlineIDslist = new List<string>();
+
+    public static Dictionary<NetworkConnection, NetworkIdentity> clientEmbDic = new Dictionary<NetworkConnection, NetworkIdentity>();
+
+    public static List<string> IdsList = new List<string>();
 
     #endregion
 
     #region knetManager FUNCTION-----------
-    /// <summary>
-    /// CREATE ROOM FOR PLAYER OFFLINE MODE
-    /// </summary>
-    public static void ServerCreateRoomOffline()
+    public static string GenRoomIds()
     {
-        string ids = KHELPERS.Helpers.GetRandomeIds();
-        offlineIDslist.Add(ids);
+        string res = "k";
+        for(int i = 0; i < 5; i++)
+        {
+            res += Random.Range(0, 255).ToString();
+        }
+        return res;
+        
     }
-
     #endregion
-
-
-
 
     /*
      * ------------------------------------------ 
@@ -166,7 +168,8 @@ public class KnetManager : NetworkManager
     /// </summary>
     /// <param name="conn">Connection from client.</param>
     public override void OnServerConnect(NetworkConnection conn) {
-        Debug.Log("KnetManager OnServerConnect : " + conn.address);
+        base.OnServerConnect(conn);
+        Debug.Log("KnetManager OnServerConnect connection id : " + conn.connectionId);
     }
 
     /// <summary>
@@ -176,6 +179,7 @@ public class KnetManager : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerReady(NetworkConnection conn)
     {
+        Debug.Log("KnetManager OnserverReady connection id " + conn.connectionId);
         base.OnServerReady(conn);
     }
 
@@ -186,7 +190,14 @@ public class KnetManager : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        base.OnServerAddPlayer(conn);
+        Transform startPos = GetStartPosition();
+        GameObject player = startPos != null
+            ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
+            : Instantiate(playerPrefab);
+
+        NetworkServer.AddPlayerForConnection(conn, player);
+        Debug.Log("KnetManager adding player netid: " + player.GetComponent<NetworkIdentity>().netId);
+        clientEmbDic.Add(conn, player.GetComponent<NetworkIdentity>());
     }
 
     /// <summary>
@@ -210,6 +221,7 @@ public class KnetManager : NetworkManager
     /// <param name="conn">Connection to the server.</param>
     public override void OnClientConnect(NetworkConnection conn)
     {
+        
         base.OnClientConnect(conn);
     }
 
@@ -247,7 +259,6 @@ public class KnetManager : NetworkManager
     /// </summary>
     public override void OnStartHost() {
         Debug.Log("KnetManager :Host is started");
-        OnServerHostStarted?.Invoke(true);
     }
 
     /// <summary>
@@ -262,7 +273,9 @@ public class KnetManager : NetworkManager
     /// <summary>
     /// This is invoked when the client is started.
     /// </summary>
-    public override void OnStartClient() { }
+    public override void OnStartClient() {
+
+    }
 
     /// <summary>
     /// This is called when a host is stopped.

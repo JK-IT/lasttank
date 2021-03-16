@@ -858,11 +858,13 @@ namespace Mirror
             conn.identity = identity;
 
             // Set the connection on the NetworkIdentity on the server, NetworkIdentity.SetLocalPlayer is not called on the server (it is on clients)
+            
             identity.SetClientOwner(conn);
 
             // special case,  we are in host mode,  set hasAuthority to true so that all overrides see it
             if (conn is LocalConnectionToClient)
             {
+                Debug.Log("Set owner of gameobject player conn " + conn);
                 identity.hasAuthority = true;
                 ClientScene.InternalAddPlayer(identity);
             }
