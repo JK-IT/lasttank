@@ -130,18 +130,19 @@ namespace Mirror
 
             if (!ready)
             {
-                Debug.LogError("Must call AddPlayer() with a connection the first time to become ready.");
+                Debug.LogError($"<color=orange>Must call AddPlayer() with a connection the first time to become ready.</color>");
                 return false;
             }
 
             if (readyConnection.identity != null)
             {
-                Debug.LogError("ClientScene.AddPlayer: a PlayerController was already added. Did you call AddPlayer twice?");
+                Debug.LogError($"<color=orange>ClientScene.AddPlayer: a PlayerController was already added. Did you call AddPlayer twice?</color>");
                 return false;
             }
 
             // Debug.Log("ClientScene.AddPlayer() called with connection [" + readyConnection + "]");
             readyConnection.Send(new AddPlayerMessage());
+            
             return true;
         }
 

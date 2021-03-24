@@ -257,7 +257,7 @@ namespace Mirror
             // Don't allow collision-destroyed second instance to continue.
             if (!InitializeSingleton()) return;
 
-            Debug.Log("Mirror | mirror-networking.com | discord.gg/N9QVxbM");
+            Debug.Log("NetworkManager Awake");
 
             // Set the networkSceneName to prevent a scene reload
             // if client connection to server fails.
@@ -340,6 +340,11 @@ namespace Mirror
             // start listening to network connections
             NetworkServer.Listen(maxConnections);
 
+            // this must be after Listen(), since that registers the default message handlers
+            RegisterServerMessages();
+
+            isNetworkActive = true;
+
             // call OnStartServer AFTER Listen, so that NetworkServer.active is
             // true and we can call NetworkServer.Spawn in OnStartServer
             // overrides.
@@ -350,10 +355,6 @@ namespace Mirror
             //       and we don't start processing connects until Update.
             OnStartServer();
 
-            // this must be after Listen(), since that registers the default message handlers
-            RegisterServerMessages();
-
-            isNetworkActive = true;
         }
 
         /// <summary>
@@ -366,7 +367,7 @@ namespace Mirror
                 Debug.LogWarning("Server already started.");
                 return;
             }
-
+            Debug.LogWarning( "STARTING SERVER SET MODE TO SERVER ONLY" );
             mode = NetworkManagerMode.ServerOnly;
 
             // StartServer is inherently ASYNCHRONOUS (=doesn't finish immediately)
@@ -387,8 +388,8 @@ namespace Mirror
 
             SetupServer();
 
-            // scene change needed? then change scene and spawn afterwards.
-            if (IsServerOnlineSceneChangeNeeded())
+            Debug.Log( "scene change needed? then change scene and spawn afterwards." );
+            if (IsServerOnlineSceneChangeNeeded() )
             {
                 ServerChangeScene(onlineScene);
             }
@@ -491,7 +492,7 @@ namespace Mirror
                 Debug.LogWarning("Server or Client already started.");
                 return;
             }
-
+            Debug.LogWarning( "NETWORK-MANAGER SET MODE TO HOST" );
             mode = NetworkManagerMode.Host;
 
             // StartHost is inherently ASYNCHRONOUS (=doesn't finish immediately)
@@ -1006,22 +1007,25 @@ namespace Mirror
             // NOTE: this cannot use NetworkClient.allClients[0] - that client may be for a completely different purpose.
 
             // process queued messages that we received while loading the scene
-            Debug.Log("FinishLoadScene: resuming handlers after scene was loading.");
+            Debug.Log($"FinishLoadScene: resuming handlers after scene was loading. THIS INS MODE IS {mode}");
             Transport.activeTransport.enabled = true;
 
             // host mode?
             if (mode == NetworkManagerMode.Host)
             {
+                Debug.Log( $"NETWORK-MANAGER -- > CALL FINISH HOST SCENE" );
                 FinishLoadSceneHost();
             }
             // server-only mode?
             else if (mode == NetworkManagerMode.ServerOnly)
             {
+                Debug.Log( $"NETWORK-MANAGER -- > CALL FINISH SERVER SCENE" );
                 FinishLoadSceneServerOnly();
             }
             // client-only mode?
             else if (mode == NetworkManagerMode.ClientOnly)
             {
+                Debug.Log( $"NETWORK-MANAGER -- > CALL FINISH CLIENT SCENE" );
                 FinishLoadSceneClientOnly();
             }
             // otherwise we called it after stopping when loading offline scene.
@@ -1036,7 +1040,7 @@ namespace Mirror
             // debug message is very important. if we ever break anything then
             // it's very obvious to notice.
             Debug.Log("Finished loading scene in host mode.");
-           
+
             if (clientReadyConnection != null)
             {
                 OnClientConnect(clientReadyConnection);
@@ -1066,7 +1070,6 @@ namespace Mirror
             // otherwise we just changed a scene in host mode
             else
             {
-                Debug.Log("Mirror Spawning player prefab");
                 // spawn server objects
                 NetworkServer.SpawnObjects();
 
@@ -1223,7 +1226,7 @@ namespace Mirror
 
         void OnServerAddPlayerInternal(NetworkConnection conn, AddPlayerMessage msg)
         {
-            //Debug.Log("NetworkManager.OnServerAddPlayer");
+            Debug.Log("NetworkManager.OnServerAddPlayer  ===== INTERNAL ADD PLAYER MESSAGE ");
 
             if (autoCreatePlayer && playerPrefab == null)
             {
@@ -1239,7 +1242,7 @@ namespace Mirror
 
             if (conn.identity != null)
             {
-                Debug.LogError("There is already a player for this connection.");
+                Debug.LogError($"There is already a player for this connection. {conn.connectionId} && {conn.identity.name}");
                 return;
             }
 
@@ -1333,7 +1336,7 @@ namespace Mirror
         public virtual void OnServerDisconnect(NetworkConnection conn)
         {
             NetworkServer.DestroyPlayerForConnection(conn);
-            Debug.Log("OnServerDisconnect: Client disconnected.");
+            Debug.Log("==== OnServerDisconnect: Client disconnected. This is CALLED BEFORE client shutdown script");
         }
 
         /// <summary>
