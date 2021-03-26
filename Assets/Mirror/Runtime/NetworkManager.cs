@@ -386,11 +386,14 @@ namespace Mirror
             // and LoadScene do not finish loading immediately. as long as we
             // have the onlineScene feature, it will be asynchronous!
 
-            SetupServer();
+            SetupServer(); //=> call onstartserver
+                           
+
 
             Debug.Log( "scene change needed? then change scene and spawn afterwards." );
-            if (IsServerOnlineSceneChangeNeeded() )
+            if (IsServerOnlineSceneChangeNeeded()) //!string.IsNullOrEmpty(onlineScene) && !IsSceneActive(onlineScene) && onlineScene != offlineScene;
             {
+                Debug.Log("---------->>>>>>>>   Server Change Scene again <<<<<<__________");
                 ServerChangeScene(onlineScene);
             }
             // otherwise spawn directly
@@ -905,7 +908,7 @@ namespace Mirror
                 return;
             }
 
-            // Debug.Log("ClientChangeScene newSceneName:" + newSceneName + " networkSceneName:" + networkSceneName);
+            Debug.Log("ClientChangeScene newSceneName Receive :" + newSceneName + " networkSceneName:" + networkSceneName + $" { DateTime.Now.ToString( "HH:mm" )} == { DateTime.Now.Millisecond}");
 
             // vis2k: pause message handling while loading scene. otherwise we will process messages and then lose all
             // the state as soon as the load is finishing, causing all kinds of bugs because of missing state.
@@ -1102,7 +1105,7 @@ namespace Mirror
         {
             // debug message is very important. if we ever break anything then
             // it's very obvious to notice.
-            Debug.Log("Finished loading scene in client-only mode.");
+            Debug.Log($"<color=ivory>----   Finished loading scene in client-only mode. ONCLIENTCONNECT = SENDING ADD PLAYER MESSAGE IS CALLED <<<<<<<<<<<></color>");
 
             if (clientReadyConnection != null)
             {
@@ -1272,7 +1275,7 @@ namespace Mirror
         // called after successful authentication
         void OnClientAuthenticated(NetworkConnection conn)
         {
-            //Debug.Log("NetworkManager.OnClientAuthenticated");
+            Debug.Log("<color=ivory>------------- NetworkManager.OnClientAuthenticated >>>>> Happened --  calling adding player or not is based on ONLINE SCENE IS EMPTY OR NOT <<<<<<<<<<<<<<></color>");
 
             // set connection to authenticated
             conn.isAuthenticated = true;
@@ -1280,11 +1283,13 @@ namespace Mirror
             // proceed with the login handshake by calling OnClientConnect
             if (string.IsNullOrEmpty(onlineScene) || onlineScene == offlineScene || IsSceneActive(onlineScene))
             {
+                Debug.Log( $"----------------------------CLIENT AUTHEN CONDITION IS TRUE TO SET CLIENTLOADEDSCENE = FALSE<<<<<<<<<<<<<<<<<<<<<<<" );
                 clientLoadedScene = false;
                 OnClientConnect(conn);
             }
             else
             {
+                Debug.Log( $"----------------------------CLIENT AUTHEN CONDITION : SET CLIENTLOADED SCENE TO TRUE SO CLIENT SKIP SENDING ADD PPLAYER MESSAGE " + $"{DateTime.Now.ToString()} {DateTime.Now.Millisecond} <<<<<<<<<<<<<<<<<<<" );
                 // will wait for scene id to come from the server.
                 clientLoadedScene = true;
                 clientReadyConnection = conn;
@@ -1309,7 +1314,7 @@ namespace Mirror
 
         void OnClientSceneInternal(NetworkConnection conn, SceneMessage msg)
         {
-            //Debug.Log("NetworkManager.OnClientSceneInternal");
+            Debug.Log(" ---------  MESSAGE RECEIVE SCENE CHANGE  NetworkManager.OnClientSceneInternal-->>>>>>>>>>>>>>");
 
             if (NetworkClient.isConnected && !NetworkServer.active)
             {
@@ -1404,6 +1409,7 @@ namespace Mirror
             // OnClientConnect by default calls AddPlayer but it should not do
             // that when we have online/offline scenes. so we need the
             // clientLoadedScene flag to prevent it.
+            
             if (!clientLoadedScene)
             {
                 // Ready/AddPlayer is usually triggered by a scene load completing. if no scene was loaded, then Ready/AddPlayer it here instead.

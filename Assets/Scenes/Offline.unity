@@ -593,7 +593,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 212935359}
-        m_TargetAssemblyTypeName: testscript, Assembly-CSharp
+        m_TargetAssemblyTypeName: UIMan, Assembly-CSharp
         m_MethodName: StopHost
         m_Mode: 1
         m_Arguments:
@@ -1246,25 +1246,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1207676327, guid: 247596ebff5abe544b9ab83c502b5bf7, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 247596ebff5abe544b9ab83c502b5bf7, type: 3}
---- !u!1 &1207676326 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1745515589899512459, guid: 247596ebff5abe544b9ab83c502b5bf7, type: 3}
-  m_PrefabInstance: {fileID: 1207676325}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1207676327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1207676326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ac2f05c6e844a94db62a6b1d4b94268, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1294412672
 GameObject:
   m_ObjectHideFlags: 0

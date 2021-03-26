@@ -1,6 +1,7 @@
 using UnityEngine;
 using Mirror;
 using System.Collections.Generic;
+using System;
 
 /*
 	Documentation: https://mirror-networking.com/docs/Guides/NetworkBehaviour.html
@@ -28,7 +29,9 @@ public class ClientMan : NetworkBehaviour
     /// Called on every NetworkBehaviour when it is activated on a client.
     /// <para>Objects on the host have this function called, as there is a local client on the host. The values of SyncVars on object are guaranteed to be initialized correctly with the latest state from the server when this function is called on the client.</para>
     /// </summary>
-    public override void OnStartClient() { }
+    public override void OnStartClient() {
+        EventClientManActive?.Invoke( base.connectionToClient );
+    }
 
     /// <summary>
     /// This is invoked on clients when the server has caused this object to be destroyed.
@@ -62,6 +65,8 @@ public class ClientMan : NetworkBehaviour
     #endregion
 
 
+    public static Action<NetworkConnection> EventClientManActive;
+
     #region ============================== CLIENT MAN VARIABLE - FUNCTION
 
     public static  ClientMan _kclientman = null;
@@ -84,6 +89,27 @@ public class ClientMan : NetworkBehaviour
         {
             return _kclientman;
         }
+    }
+
+
+    //                                                          ----------===============------------------
+
+    public void Cli_CreateRoom()
+    {
+        CmdCreateRoom();
+        
+    }
+
+    [Command]
+    private void CmdCreateRoom() // passin nothing will auto send the network connection on server, server keep track of who command him
+    {
+        H.klog3( $"Sever received request to create room , conn {connectionToClient}" );
+        foreach(KeyValuePair<NetworkConnection, GameObject> ele in KnetMan.clientlist)
+        {
+            H.klog1( $"{ele.Key} --- {ele.Value}" );
+        }
+        string genid = H.GenerateIds();
+        H.klog1($"returnning service {genid}");
     }
 
 

@@ -15,6 +15,7 @@ public class KnetMan : NetworkManager
     public static List<NetworkConnection> connlist = new List<NetworkConnection>();
 
     public static Dictionary<NetworkConnection, GameObject> clientlist = new Dictionary<NetworkConnection, GameObject>();
+
     
     #endregion
 
@@ -154,6 +155,7 @@ public class KnetMan : NetworkManager
         }
         Debug.Log( $"<color=lightblue>{this.name} --- Adding Conn : {conn.connectionId}</color>" );
         connlist.Add( conn );
+        
     }
 
     /// <summary>
@@ -177,16 +179,25 @@ public class KnetMan : NetworkManager
         GameObject player = startPos != null
             ? Instantiate( playerPrefab, startPos.position, startPos.rotation )
             : Instantiate( playerPrefab );
-
+        H.klog1( "" );
         if(clientlist.ContainsKey(conn))
         {
-            Debug.Log( $"{this.name} -- CLIENT LIST ALREADY HAD THIS CONN WITH PLAYER" );
+            Debug.Log( $"{this.name} -- CLIENT LIST ALREADY HAD THIS CONN {conn} WITH PLAYER" );
+            H.klog3( $"Client list count {KnetMan.clientlist.Count}", "orange" );
+            foreach (KeyValuePair<NetworkConnection, GameObject> ele in KnetMan.clientlist)
+            {
+                H.klog3( $"{ele.Key} --- {ele.Value}", "yellow" );
+            }
         } else
         {
             clientlist.Add( conn, player );
             Debug.Log( $"<color=orange>{this.name} --- ADDING CLIENT TO CLIENT LIST  || list length : {connlist.Count} && {clientlist.Count}</color>" );
+            foreach (KeyValuePair<NetworkConnection, GameObject> ele in KnetMan.clientlist)
+            {
+                H.klog3( $"{ele.Key} --- {ele.Value}", "yellow" );
+            }
         }
-
+        
         NetworkServer.AddPlayerForConnection( conn, player );
 
         //base.OnServerAddPlayer(conn);
@@ -222,7 +233,20 @@ public class KnetMan : NetworkManager
     /// <param name="conn">Connection to the server.</param>
     public override void OnClientConnect(NetworkConnection conn)
     {
-        base.OnClientConnect(conn);
+        //base.OnClientConnect(conn);
+        // OnClientConnect by default calls AddPlayer but it should not do
+        // that when we have online/offline scenes. so we need the
+        // clientLoadedScene flag to prevent it.
+        H.klog3( $"Client Connect && Client Loaded scene is true ??? {clientLoadedScene}", "orange" );
+        if (!clientLoadedScene)
+        {
+            // Ready/AddPlayer is usually triggered by a scene load completing. if no scene was loaded, then Ready/AddPlayer it here instead.
+            if (!ClientScene.ready) ClientScene.Ready( conn );
+            if (autoCreatePlayer)
+            {
+                ClientScene.AddPlayer( conn );
+            }
+        }
     }
 
     /// <summary>
@@ -264,8 +288,8 @@ public class KnetMan : NetworkManager
     /// </summary>
     public override void OnStartServer() {
 
-        Debug.Log( $"{this.name} -- ON-START-SERVER - Register scene to load" );
-        ServerChangeScene( "Online" );
+       // Debug.Log( $"{this.name} -- ON-START-SERVER - Register scene to load" );
+        //ServerChangeScene( "Online" );
     }
 
     /// <summary>
