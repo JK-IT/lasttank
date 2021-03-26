@@ -75,7 +75,10 @@ public class UIMan : MonoBehaviour
         netman.StopClient();
     }
 
-   
+    public void Quit()
+    {
+        Application.Quit();
+    }
 
 
     /// <summary>

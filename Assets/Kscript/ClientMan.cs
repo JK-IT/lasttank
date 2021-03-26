@@ -30,14 +30,16 @@ public class ClientMan : NetworkBehaviour
     /// <para>Objects on the host have this function called, as there is a local client on the host. The values of SyncVars on object are guaranteed to be initialized correctly with the latest state from the server when this function is called on the client.</para>
     /// </summary>
     public override void OnStartClient() {
-        EventClientManActive?.Invoke( base.connectionToClient );
+        EventClientEmbStart?.Invoke( base.connectionToClient );
     }
 
     /// <summary>
     /// This is invoked on clients when the server has caused this object to be destroyed.
     /// <para>This can be used as a hook to invoke effects or do client specific cleanup.</para>
     /// </summary>
-    public override void OnStopClient() { }
+    public override void OnStopClient() {
+        EventClientEmbStop?.Invoke( base.connectionToClient );
+    }
 
     /// <summary>
     /// Called when the local player object has been set up.
@@ -70,7 +72,8 @@ public class ClientMan : NetworkBehaviour
     #region ============================== CLIENT MAN VARIABLE - FUNCTION
 
     public static  ClientMan _kclientman = null;
-
+    public static System.Action<NetworkConnection> EventClientEmbStart;
+    public static System.Action<NetworkConnection> EventClientEmbStop;
 
     public static  ClientMan ReturnClientManIns(NetworkConnection conn = null)
     {

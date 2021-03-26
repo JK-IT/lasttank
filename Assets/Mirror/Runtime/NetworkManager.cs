@@ -978,8 +978,10 @@ namespace Mirror
         // TODO merge this with FinishLoadScene()?
         void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            Debug.Log( $"<color=mintcream> ------    ON SCENE LOADED -------</color>" );
             if (mode == LoadSceneMode.Additive)
             {
+                Debug.Log( $"<color=mintcream> ------    ADDICTIVE MODE???? -------</color>" );
                 if (NetworkServer.active)
                 {
                     // TODO only respawn the server objects from that scene later!

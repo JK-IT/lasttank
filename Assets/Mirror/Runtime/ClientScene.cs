@@ -215,6 +215,7 @@ namespace Mirror
                 // add all unspawned NetworkIdentities to spawnable objects
                 if (ConsiderForSpawning(identity))
                 {
+                    Debug.Log( $"<color=ivory>------------  ADDING SPAWNABLE OBJECTS -------------</color>" );
                     spawnableObjects.Add(identity.sceneId, identity);
                 }
             }
